@@ -43,6 +43,21 @@ jobs:
         with:
           merge-multiple: true
           path: ./artifacts
+      # Files attached to GitHub releases have a size limit of 2GiB
+      - name: Split large files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: artifacts
+        # Note: will not work on macos, but we can run the release job on ubuntu only.
+        run: |
+          MAX_ARCHIVE_SIZE=2147483648
+          for archive in ./*.tar.gz; do
+            archive_size=$(stat -c%s "${archive}")
+            if (( archive_size >= MAX_ARCHIVE_SIZE )); then
+              split -b 2GB "${archive}" "${archive}."
+              rm "${archive}"
+            fi
+          done
       - name: Publish release
         id: publish-release
         env:
