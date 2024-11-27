@@ -65,4 +65,8 @@ jobs:
         working-directory: artifacts
         run: |
           artifacts=(./*)
-          gh release create ${{github.ref_name}} --notes "OpenHarmony SDK mirror release for ${{github.ref_name}}" "${artifacts[@]}"
+          notes="OpenHarmony SDK mirror release for ${{github.ref_name}}."
+          notes="${notes}\nArchives larger than 2 GiB are split into multiple chunks and can be concatenated again by"
+          notes="${notes} using the cat command (e.g. cat part1.tar.gz.aa part2.tar.gz.ab > sdk.tar.gz)."
+          notes="${notes}\nThis is due to GitHub limiting the maximum artifact size."
+          gh release create ${{github.ref_name}} --title "${{github.ref_name}}" --notes "${notes}" "${artifacts[@]}"
